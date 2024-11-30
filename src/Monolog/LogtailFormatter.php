@@ -30,14 +30,14 @@ class LogtailFormatter extends JsonFormatter
 
     public function format(LogRecord $record): string
     {
-        $normalized = $this->normalize(self::formatRecord($record));
+        $normalized = $this->normalize(static::formatRecord($record));
 
         return $this->toJson($normalized, true);
     }
 
     public function formatBatch(array $records): string
     {
-        $normalized = array_values($this->normalize(array_map(self::formatRecord(...), $records)));
+        $normalized = array_values($this->normalize(array_map(static::formatRecord(...), $records)));
 
         return $this->toJson($normalized, true);
     }
