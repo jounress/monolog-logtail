@@ -29,6 +29,7 @@ class LogtailClient
     public const URL = 'https://in.logs.betterstack.com';
 
     public const DEFAULT_CONNECTION_TIMEOUT_MILLISECONDS = 5000;
+
     public const DEFAULT_TIMEOUT_MILLISECONDS = 5000;
 
     private string $sourceToken;
@@ -40,7 +41,6 @@ class LogtailClient
     private int $connectionTimeoutMs;
 
     private int $timeoutMs;
-
 
     public function __construct(
         string $sourceToken,

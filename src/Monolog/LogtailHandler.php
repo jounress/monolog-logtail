@@ -85,12 +85,14 @@ class LogtailHandler extends BufferHandler
     public function flush(): void
     {
         parent::flush();
+
         $this->setHighResolutionTimeOfLastFlush();
     }
 
     private function setHighResolutionTimeOfLastFlush(): void
     {
         $currentHighResolutionTime = hrtime(true);
+
         if ($this->flushIntervalMs === null || $currentHighResolutionTime === false) {
             $this->highResolutionTimeOfNextFlush = null;
 
