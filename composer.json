@@ -14,7 +14,7 @@
     },
     "require-dev": {
         "laravel/pint": "^1.18",
-        "pestphp/pest": "^3.5",
+        "pestphp/pest": "^2.36",
         "roave/security-advisories": "dev-latest"
     },
     "autoload": {
