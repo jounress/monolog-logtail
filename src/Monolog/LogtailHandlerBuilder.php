@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the logtail/monolog-logtail package.
@@ -9,11 +9,13 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Logtail\Monolog;
 
 use Monolog\Level;
 
-final class LogtailHandlerBuilder
+class LogtailHandlerBuilder
 {
     private string $sourceToken;
     private Level $level = Level::Debug;
@@ -54,10 +56,9 @@ final class LogtailHandlerBuilder
      */
     public function withLevel(Level $level): self
     {
-        $clone = clone $this;
-        $clone->level = $level;
-        
-        return $clone;
+        $this->level = $level;
+
+        return $this;
     }
 
     /**
@@ -68,10 +69,9 @@ final class LogtailHandlerBuilder
      */
     public function withLogBubbling(bool $bubble): self
     {
-        $clone = clone $this;
-        $clone->bubble = $bubble;
-        
-        return $clone;
+        $this->bubble = $bubble;
+
+        return $this;
     }
 
     /**
@@ -82,10 +82,9 @@ final class LogtailHandlerBuilder
      */
     public function withBufferLimit(int $bufferLimit): self
     {
-        $clone = clone $this;
-        $clone->bufferLimit = $bufferLimit;
-        
-        return $clone;
+        $this->bufferLimit = $bufferLimit;
+
+        return $this;
     }
 
     /**
@@ -96,10 +95,9 @@ final class LogtailHandlerBuilder
      */
     public function withFlushOnOverflow(bool $flushOnOverflow): self
     {
-        $clone = clone $this;
-        $clone->flushOnOverflow = $flushOnOverflow;
-        
-        return $clone;
+        $this->flushOnOverflow = $flushOnOverflow;
+
+        return $this;
     }
 
     /**
@@ -110,10 +108,9 @@ final class LogtailHandlerBuilder
      */
     public function withConnectionTimeoutMilliseconds(int $connectionTimeoutMs): self
     {
-        $clone = clone $this;
-        $clone->connectionTimeoutMs = $connectionTimeoutMs;
-        
-        return $clone;
+        $this->connectionTimeoutMs = $connectionTimeoutMs;
+
+        return $this;
     }
 
     /**
@@ -124,10 +121,9 @@ final class LogtailHandlerBuilder
      */
     public function withTimeoutMilliseconds(int $timeoutMs): self
     {
-        $clone = clone $this;
-        $clone->timeoutMs = $timeoutMs;
-        
-        return $clone;
+        $this->timeoutMs = $timeoutMs;
+
+        return $this;
     }
 
     /**
@@ -138,10 +134,9 @@ final class LogtailHandlerBuilder
      */
     public function withFlushIntervalMilliseconds(?int $flushIntervalMs): self
     {
-        $clone = clone $this;
-        $clone->flushIntervalMs = $flushIntervalMs;
-        
-        return $clone;
+        $this->flushIntervalMs = $flushIntervalMs;
+
+        return $this;
     }
 
     /**
@@ -152,10 +147,9 @@ final class LogtailHandlerBuilder
      */
     public function withExceptionThrowing(bool $throwExceptions): self
     {
-        $clone = clone $this;
-        $clone->throwExceptions = $throwExceptions;
+        $this->throwExceptions = $throwExceptions;
 
-        return $clone;
+        return $this;
     }
 
     /**
@@ -174,7 +168,8 @@ final class LogtailHandlerBuilder
             $this->flushOnOverflow,
             $this->connectionTimeoutMs,
             $this->timeoutMs,
-            $this->flushIntervalMs
+            $this->flushIntervalMs,
+            $this->throwExceptions
         );
     }
 }

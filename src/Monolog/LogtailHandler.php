@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the logtail/monolog-logtail package.
@@ -9,9 +9,12 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Logtail\Monolog;
 
 use Monolog\Handler\BufferHandler;
+use Monolog\Handler\HandlerInterface;
 use Monolog\Level;
 use Monolog\LogRecord;
 
@@ -20,39 +23,46 @@ use Monolog\LogRecord;
  */
 class LogtailHandler extends BufferHandler
 {
-    const DEFAULT_BUBBLE = true;
-    const DEFAULT_BUFFER_LIMIT = 1000;
-    const DEFAULT_FLUSH_ON_OVERFLOW = true;
-    const DEFAULT_FLUSH_INTERVAL_MILLISECONDS = 5000;
+    public const DEFAULT_BUBBLE = true;
+
+    public const DEFAULT_BUFFER_LIMIT = 1000;
+
+    public const DEFAULT_FLUSH_ON_OVERFLOW = true;
+
+    public const DEFAULT_FLUSH_INTERVAL_MILLISECONDS = 5000;
 
     private ?int $flushIntervalMs;
+
     private int|float|null $highResolutionTimeOfNextFlush;
 
+    protected HandlerInterface $handler;
+
     /**
-     * @param string           $sourceToken         Logtail source token
-     * @param int|string|Level $level               The minimum logging level at which this handler will be triggered
-     * @param bool             $bubble              Whether the messages that are handled can bubble up the stack or not
-     * @param string           $endpoint            Logtail ingesting endpoint
-     * @param int              $bufferLimit         How many entries should be buffered at most, beyond that the oldest items are removed from the buffer
-     * @param bool             $flushOnOverflow     If true, the buffer is flushed when the max size has been reached, by default oldest entries are discarded
-     * @param int              $connectionTimeoutMs The maximum time in milliseconds that you allow the connection phase to the server to take
-     * @param int              $timeoutMs           The maximum time in milliseconds that you allow a transfer operation to take
-     * @param int|null         $flushIntervalMs     The time in milliseconds after which next log record will trigger flushing all logs. Null to disable
-     * @param bool             $throwExceptions     Whether to throw exceptions when sending logs fails
+     * @param string $sourceToken Logtail source token
+     * @param int|string|Level $level The minimum logging level at which this handler will be triggered
+     * @param bool $bubble Whether the messages that are handled can bubble up the stack or not
+     * @param string $endpoint Logtail ingesting endpoint
+     * @param int $bufferLimit How many entries should be buffered at most, beyond that the oldest items are removed from the buffer
+     * @param bool $flushOnOverflow If true, the buffer is flushed when the max size has been reached, by default oldest entries are discarded
+     * @param int $connectionTimeoutMs The maximum time in milliseconds that you allow the connection phase to the server to take
+     * @param int $timeoutMs The maximum time in milliseconds that you allow a transfer operation to take
+     * @param int|null $flushIntervalMs The time in milliseconds after which next log record will trigger flushing all logs. Null to disable
+     * @param bool $throwExceptions Whether to throw exceptions when sending logs fails
      */
     public function __construct(
-        string $sourceToken,
-        int|string|Level $level = Level::Debug,
-        bool $bubble = self::DEFAULT_BUBBLE,
-        string $endpoint = LogtailClient::URL,
-        int $bufferLimit = self::DEFAULT_BUFFER_LIMIT,
-        bool $flushOnOverflow = self::DEFAULT_FLUSH_ON_OVERFLOW,
-        int $connectionTimeoutMs = LogtailClient::DEFAULT_CONNECTION_TIMEOUT_MILLISECONDS,
-        int $timeoutMs = LogtailClient::DEFAULT_TIMEOUT_MILLISECONDS,
-        ?int $flushIntervalMs = self::DEFAULT_FLUSH_INTERVAL_MILLISECONDS,
-        bool $throwExceptions = SynchronousLogtailHandler::DEFAULT_THROW_EXCEPTION
+        string             $sourceToken,
+        int|string|Level   $level = Level::Debug,
+        bool               $bubble = self::DEFAULT_BUBBLE,
+        string             $endpoint = LogtailClient::URL,
+        int                $bufferLimit = self::DEFAULT_BUFFER_LIMIT,
+        bool               $flushOnOverflow = self::DEFAULT_FLUSH_ON_OVERFLOW,
+        int                $connectionTimeoutMs = LogtailClient::DEFAULT_CONNECTION_TIMEOUT_MILLISECONDS,
+        int                $timeoutMs = LogtailClient::DEFAULT_TIMEOUT_MILLISECONDS,
+        ?int               $flushIntervalMs = self::DEFAULT_FLUSH_INTERVAL_MILLISECONDS,
+        bool               $throwExceptions = SynchronousLogtailHandler::DEFAULT_THROW_EXCEPTION,
     ) {
         parent::__construct(new SynchronousLogtailHandler($sourceToken, $level, $bubble, $endpoint, $connectionTimeoutMs, $timeoutMs, $throwExceptions), $bufferLimit, $level, $bubble, $flushOnOverflow);
+
         $this->flushIntervalMs = $flushIntervalMs;
         $this->setHighResolutionTimeOfLastFlush();
     }
@@ -72,9 +82,6 @@ class LogtailHandler extends BufferHandler
         return $return;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function flush(): void
     {
         parent::flush();

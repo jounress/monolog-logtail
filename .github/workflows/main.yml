@@ -6,7 +6,6 @@ on:
   push:
     branches:
       - master
-      - 2.x
 
 jobs:
   build:
@@ -26,12 +25,13 @@ jobs:
       fail-fast: false
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Setup PHP with CURL extension
       uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ matrix.php-version }}
+        coverage: xdebug
         extensions: curl
 
     - name: Validate composer.json

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the logtail/monolog-logtail package.
@@ -8,6 +8,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace Logtail\Monolog;
 
@@ -19,15 +21,17 @@ use Monolog\Processor\HostnameProcessor;
 use Monolog\Processor\IntrospectionProcessor;
 use Monolog\Processor\ProcessIdProcessor;
 use Monolog\Processor\WebProcessor;
+use Throwable;
 
 /**
  * Sends log to Logtail.
  */
 class SynchronousLogtailHandler extends AbstractProcessingHandler
 {
-    const DEFAULT_THROW_EXCEPTION = false;
+    public const DEFAULT_THROW_EXCEPTION = false;
 
     private LogtailClient $client;
+
     private bool $throwExceptions;
 
     /**
@@ -37,7 +41,7 @@ class SynchronousLogtailHandler extends AbstractProcessingHandler
      * @param string $endpoint
      * @param int $connectionTimeoutMs
      * @param int $timeoutMs
-     * @param bool throwExceptions
+     * @param bool $throwExceptions
      */
     public function __construct(
         string $sourceToken,
@@ -54,41 +58,44 @@ class SynchronousLogtailHandler extends AbstractProcessingHandler
         $this->throwExceptions = $throwExceptions;
 
         $this->pushProcessor(new IntrospectionProcessor($level, ['Logtail\\']));
-        $this->pushProcessor(new WebProcessor);
-        $this->pushProcessor(new ProcessIdProcessor);
-        $this->pushProcessor(new HostnameProcessor);
+        $this->pushProcessor(new WebProcessor());
+        $this->pushProcessor(new ProcessIdProcessor());
+        $this->pushProcessor(new HostnameProcessor());
     }
 
     /**
      * @param LogRecord $record
+     * @throws Throwable
      */
-    protected function write(LogRecord $record): void {
+    protected function write(LogRecord $record): void
+    {
         try {
             $this->client->send($record->formatted);
         } catch (Throwable $throwable) {
             if ($this->throwExceptions) {
                 throw $throwable;
-            } else {
-                 trigger_error("Failed to send a single log record to Better Stack because of " . $throwable, E_USER_WARNING);
-             }
+            }
+
+            trigger_error('Failed to send a single log record to Better Stack because of ' . $throwable, E_USER_WARNING);
         }
     }
 
     /**
      * @param array $records
      * @return void
+     * @throws Throwable
      */
     public function handleBatch(array $records): void
     {
         $formattedRecords = $this->getFormatter()->formatBatch($records);
         try {
             $this->client->send($formattedRecords);
-        } catch (\Throwable $throwable) {
+        } catch (Throwable $throwable) {
             if ($this->throwExceptions) {
                 throw $throwable;
-            } else {
-                 trigger_error("Failed to send " . count($records) . " log records to Better Stack because of " . $throwable, E_USER_WARNING);
             }
+
+            trigger_error('Failed to send ' . count($records) . ' log records to Better Stack because of ' . $throwable, E_USER_WARNING);
         }
     }
 
@@ -98,10 +105,5 @@ class SynchronousLogtailHandler extends AbstractProcessingHandler
     protected function getDefaultFormatter(): FormatterInterface
     {
         return new LogtailFormatter();
-    }
-
-    public function getFormatter(): FormatterInterface
-    {
-        return $this->getDefaultFormatter();
     }
 }

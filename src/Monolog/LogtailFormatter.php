@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Logtail\Monolog;
 
 use Monolog\Formatter\JsonFormatter;
@@ -17,14 +19,17 @@ use Monolog\LogRecord;
 /**
  * Format JSON records for Logtail
  */
-class LogtailFormatter extends JsonFormatter {
-
-    public function __construct() {
+class LogtailFormatter extends JsonFormatter
+{
+    public function __construct()
+    {
         parent::__construct(self::BATCH_MODE_JSON, false);
+
         $this->setMaxNormalizeItemCount(PHP_INT_MAX);
     }
 
-    public function format(LogRecord $record): string {
+    public function format(LogRecord $record): string
+    {
         $normalized = $this->normalize(self::formatRecord($record));
 
         return $this->toJson($normalized, true);
@@ -33,6 +38,7 @@ class LogtailFormatter extends JsonFormatter {
     public function formatBatch(array $records): string
     {
         $normalized = array_values($this->normalize(array_map(self::formatRecord(...), $records)));
+
         return $this->toJson($normalized, true);
     }
 
